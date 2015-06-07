@@ -96,9 +96,9 @@
          (targets-file (format nil "~A~@[.~A~]"
                                id
                                (pathname-type pathname))))
-    (rename-file path
-                 (merge-pathnames targets-file
-                                  (path acceptor)))
+    (copy-file path
+               (merge-pathnames targets-file
+                                (path acceptor)))
     (add-target targets-file targets-file :file)))
 
 ;;; Handling requests ----------------------------------------------------------
