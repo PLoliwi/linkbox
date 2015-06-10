@@ -1,6 +1,5 @@
 (defpackage :linkbox
-  (:use :cl :hunchentoot :alexandria
-   :optima :optima.ppcre)
+  (:use :cl :hunchentoot :alexandria)
   (:export #:make-linkbox))
 (in-package :linkbox)
 
@@ -116,27 +115,24 @@
         "Failed.")))
 
 (defmethod acceptor-dispatch-request ((acceptor linkbox-acceptor) request)
-  (match (script-name*)
-    ;; Creation
-    ((guard (ppcre "^/$")
-            (and (eq (request-method*) :post)
-                 (equal (post-parameter "auth")
-                        (auth acceptor))))
+  (cond
+    ((and (string= (script-name*) "/")
+          (eq (request-method*) :post)
+          (equal (post-parameter "auth")
+                 (auth acceptor)))
      (handle-create))
-    ;; Redirecting
-    ((ppcre "^/(.+)$" name)
-     (destructuring-bind (&optional type target)
-         (target name)
-       (if (and type target)
-           (case type
-             (:file
-              (handle-static-file
-               (merge-pathnames target (path acceptor))))
-             (:url (redirect target :code +http-see-other+))
-             (t (fail)))
-           (fail))))
-    (_ (setf (return-code*) +http-not-found+)
-       nil)))
+    ((ppcre:register-groups-bind (name)
+         ("^/(.+)$" (script-name*))
+       (destructuring-bind (&optional type target)
+           (target name)
+         (if (and type target)
+             (case type
+               (:file (prog1 t
+                        (handle-static-file
+                         (merge-pathnames target (path acceptor)))))
+               (:url (prog1 t
+                       (redirect target :code +http-see-other+))))))))
+    (t (setf (return-code*) +http-not-found+))))
 
 ;;; Convenience ----------------------------------------------------------------
 

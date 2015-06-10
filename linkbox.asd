@@ -3,7 +3,5 @@
   :author "Joram Schrijver <i@joram.io>"
   :license "MIT"
   :depends-on (#:hunchentoot
-               #:alexandria
-               #:optima
-               #:optima.ppcre)
+               #:alexandria)
   :components ((:file "server")))
