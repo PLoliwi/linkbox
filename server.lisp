@@ -25,7 +25,7 @@
   (with-open-file (stream (targets-file acceptor)
                           :direction :output
                           :if-exists :supersede)
-    (print (hash-table-alist (%targets acceptor))
+    (prin1 (hash-table-alist (%targets acceptor))
            stream)))
 
 (defun load-targets (acceptor)
@@ -65,7 +65,7 @@
   (with-open-file (stream (id-file acceptor)
                           :direction :output
                           :if-exists :supersede)
-    (print (%id acceptor) stream)))
+    (prin1 (%id acceptor) stream)))
 
 (defun integer->letters (integer)
   (let* ((characters #.(concatenate 'string
