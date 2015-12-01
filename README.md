@@ -6,6 +6,7 @@ Linkbox is a very simple URL shortener and file upload box.
 
 - [Alexandria](http://common-lisp.net/project/alexandria/) (Public Domain)
 - [Hunchentoot](http://weitz.de/hunchentoot/) (BSD)
+- [CL-PPCRE](http://weitz.de/cl-ppcre/) (BSD)
 
 ## Usage
 
