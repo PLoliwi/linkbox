@@ -102,6 +102,10 @@
 
 ;;; Handling requests ----------------------------------------------------------
 
+(defun respond (http-code body)
+  (prog1 body
+    (setf (return-code*) http-code)))
+
 (defun handle-create (&optional (acceptor *acceptor*))
   (let ((id (cond
               ((stringp (post-parameter "url"))
@@ -109,10 +113,11 @@
               ((consp (post-parameter "file"))
                (apply 'create-file-url (post-parameter "file"))))))
     (if id
-        (format nil "~A~A"
-                (url acceptor)
-                id)
-        "Failed.")))
+        (respond 200
+                 (format nil "~A~A"
+                         (url acceptor)
+                         id))
+        (respond 400 "Failed."))))
 
 (defmethod acceptor-dispatch-request ((acceptor linkbox-acceptor) request)
   (cond
@@ -126,13 +131,14 @@
        (destructuring-bind (&optional type target)
            (target name)
          (if (and type target)
-             (case type
+             (ecase type
                (:file (prog1 t
                         (handle-static-file
                          (merge-pathnames target (path acceptor)))))
                (:url (prog1 t
                        (redirect target :code +http-see-other+))))))))
-    (t (setf (return-code*) +http-not-found+))))
+    (t (setf (return-code*) +http-not-found+)
+       (respond 404 "Not found."))))
 
 ;;; Convenience ----------------------------------------------------------------
 
